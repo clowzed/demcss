@@ -19,6 +19,27 @@ macro_rules! info {
     }};
 }
 
+macro_rules! render {
+    ($a:expr, $b:expr, $c:expr) => {{
+        info!(format!("Trying to render {}", $a));
+        let rendered_template: Option<String> = match $c.render_engine.render($a, &$b) {
+            Ok(rendered_template) => {
+                info!(format!("Rendered template: {} suceeded", $a));
+                Some(rendered_template)
+            }
+            Err(err) => {
+                warning!(format!(
+                    "Rendering template {} failed! Reason: {}",
+                    $a,
+                    err.to_string()
+                ));
+                None
+            }
+        };
+        rendered_template
+    }};
+}
+
 struct AppData {
     render_engine: tera::Tera,
 }
