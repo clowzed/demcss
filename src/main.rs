@@ -51,8 +51,22 @@ struct AppData {
 }
 
 #[actix_web::get("/")]
-async fn index() -> impl actix_web::Responder {
-    actix_web::HttpResponse::Ok().body("hello")
+async fn index(conf: actix_web::web::Data<AppData>) -> impl actix_web::Responder {
+    info!("Got request for index...");
+
+    let context = tera::Context::new();
+
+    info!("Trying to render index.html");
+
+    match render!("index.html", context, conf) {
+        Some(html) => {
+            info!("Request was successfully processed");
+            return actix_web::HttpResponse::Ok().body(html);
+        }
+        None => {
+            return actix_web::HttpResponse::InternalServerError().finish();
+        }
+    }
 }
 
 #[actix_web::main]
@@ -95,8 +109,10 @@ async fn main() -> std::io::Result<()> {
 
     info!("Initializing `tera` rendering engine...");
 
+    // Initializing the `tera` rendering engine.
     let tera = tera::Tera::new(&tmplfolder).expect("Failed to initialize tera rendering engine");
 
+    // `app_data` is a variable that holds the `AppData` struct.
     let app_data = actix_web::web::Data::new(AppData {
         render_engine: tera.clone(),
     });
