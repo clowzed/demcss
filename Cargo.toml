@@ -1,8 +1,16 @@
 [package]
-name = "cssing"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+name        = "cssing"
+version     = "0.1.0"
+edition     = "2021"
+authors     = ["Miasnenko Dmitry <clowzed.work@gmail.com>"]
+description = "A rust web server for showing demos of your classless css frameworks."
+license     = "MIT"
+publish     = false
+categories  = ["CSS", "web", "server"]
 
 [dependencies]
+actix-web   = { version = "4.1.0",  features = ["rustls"] }
+rustls      = "0.20.6"
+dotenv      = "0.15.0"
+lazy_static = "1.4.0"
+tera        = "1.17.0"
