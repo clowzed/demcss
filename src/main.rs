@@ -50,6 +50,32 @@ struct AppData {
     render_engine: tera::Tera,
 }
 
+#[derive(serde::Serialize)]
+struct DemoRequest {
+    stylesheet: String,
+}
+
+#[actix_web::get("/demo")]
+async fn demo(
+    conf: actix_web::web::Data<AppData>,
+    params: actix_web::web::Query<DemoRequest>,
+) -> impl actix_web::Responder {
+    info!("Got request for demo...");
+
+    let mut context = tera::Context::new();
+    context.insert("stylesheet", params.stylesheet);
+
+    match render!("demo.html", context, conf) {
+        Some(html) => {
+            info!("Request was successfully processed");
+            return actix_web::HttpResponse::Ok().body(html);
+        }
+        None => {
+            return actix_web::HttpResponse::InternalServerError().finish();
+        }
+    }
+}
+
 #[actix_web::get("/")]
 async fn index(conf: actix_web::web::Data<AppData>) -> impl actix_web::Responder {
     info!("Got request for index...");
