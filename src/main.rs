@@ -1,5 +1,6 @@
 use colored::*;
 
+// A macro that is used to print an error message and exit the program.
 macro_rules! error {
     ($a:expr) => {{
         println!("{} {}", String::from("ERROR   :").red().bold(), $a);
@@ -7,18 +8,21 @@ macro_rules! error {
     }};
 }
 
+// A macro that is used to print a warning message.
 macro_rules! warning {
     ($a:expr) => {{
         println!("{} {}", String::from("WARNING :").yellow().bold(), $a);
     }};
 }
 
+// A macro that is used to print an information message.
 macro_rules! info {
     ($a:expr) => {{
         println!("{} {}", String::from("INFO    :").green().bold(), $a);
     }};
 }
 
+// A macro that is used to render a template.
 macro_rules! render {
     ($a:expr, $b:expr, $c:expr) => {{
         info!(format!("Trying to render {}", $a));
@@ -40,6 +44,8 @@ macro_rules! render {
     }};
 }
 
+// `AppData` is a struct that contains a single field, `render_engine`, which is a `tera::Tera` type.
+// The `tera` crate is a crate that is used to render templates.
 struct AppData {
     render_engine: tera::Tera,
 }
@@ -53,6 +59,7 @@ async fn index() -> impl actix_web::Responder {
 async fn main() -> std::io::Result<()> {
     info!("Trying to load environment variables from .env file");
 
+    // It loads environment variables from a .env file.
     match dotenv::dotenv() {
         Ok(path) => info!(format!(
             "Environment variables were loaded from {}",
@@ -64,6 +71,7 @@ async fn main() -> std::io::Result<()> {
         )),
     };
 
+    // A variable that holds the port number that the server will listen to.
     let port: u16 = match std::env::var("CSSING_PORT") {
         Ok(port) => {
             info!(format!("Port = {}", port));
@@ -76,6 +84,7 @@ async fn main() -> std::io::Result<()> {
         Err(_) => error!("Failed to read environment variable 'CSSING_PORT'"),
     };
 
+    // `tmplfolder` is a variable that holds the path to the folder that contains the templates.
     let tmplfolder = match std::env::var("CSSING_TEMPLATES_FOLDER") {
         Ok(dir) => {
             info!(format!("Templates folder = {}", dir));
@@ -88,12 +97,16 @@ async fn main() -> std::io::Result<()> {
 
     let tera = tera::Tera::new(&tmplfolder).expect("Failed to initialize tera rendering engine");
 
-    let app_data = actix_web::web::Data::new(std::sync::Mutex::new(AppData {
+    let app_data = actix_web::web::Data::new(AppData {
         render_engine: tera.clone(),
-    }));
+    });
 
-    actix_web::HttpServer::new(|| actix_web::App::new().service(index))
-        .bind(("127.0.0.1", port))?
-        .run()
-        .await
+    actix_web::HttpServer::new(move || {
+        actix_web::App::new()
+            .service(index)
+            .app_data(app_data.clone())
+    })
+    .bind(("127.0.0.1", port))?
+    .run()
+    .await
 }
