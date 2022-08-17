@@ -76,7 +76,17 @@ async fn main() -> std::io::Result<()> {
         Err(_) => error!("Failed to read environment variable 'CSSING_PORT'"),
     };
 
-    let tera = tera::Tera::new("/templates").expect("Failed to initialize tera rendering engine");
+    let tmplfolder = match std::env::var("CSSING_TEMPLATES_FOLDER") {
+        Ok(dir) => {
+            info!(format!("Templates folder = {}", dir));
+            dir
+        }
+        Err(_) => error!("Failed to read environment variable 'CSSING_TEMPLATES_FOLDER'"),
+    };
+
+    info!("Initializing `tera` rendering engine...");
+
+    let tera = tera::Tera::new(&tmplfolder).expect("Failed to initialize tera rendering engine");
 
     let app_data = actix_web::web::Data::new(std::sync::Mutex::new(AppData {
         render_engine: tera.clone(),
