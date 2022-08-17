@@ -56,8 +56,6 @@ async fn index(conf: actix_web::web::Data<AppData>) -> impl actix_web::Responder
 
     let context = tera::Context::new();
 
-    info!("Trying to render index.html");
-
     match render!("index.html", context, conf) {
         Some(html) => {
             info!("Request was successfully processed");
