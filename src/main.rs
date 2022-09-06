@@ -50,7 +50,7 @@ struct AppData {
     render_engine: tera::Tera,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 struct DemoRequest {
     stylesheet: String,
 }
@@ -63,7 +63,7 @@ async fn demo(
     info!("Got request for demo...");
 
     let mut context = tera::Context::new();
-    context.insert("stylesheet", params.stylesheet);
+    context.insert("stylesheet", &params.stylesheet);
 
     match render!("demo.html", context, conf) {
         Some(html) => {
@@ -144,6 +144,7 @@ async fn main() -> std::io::Result<()> {
     actix_web::HttpServer::new(move || {
         actix_web::App::new()
             .service(index)
+            .service(demo)
             .app_data(app_data.clone())
     })
     .bind(("127.0.0.1", port))?
