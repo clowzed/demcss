@@ -1,0 +1,10 @@
+./src
+./target
+.env
+.gitignore
+Cargo.toml
+Cargo.lock
+LICENSE
+makefile
+nginx.conf
+README.md
