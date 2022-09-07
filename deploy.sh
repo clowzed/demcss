@@ -29,19 +29,19 @@ cat ./nginx.conf > /etc/nginx/sites-available/demcss
 ln /etc/nginx/sites-available/demcss /etc/nginx/sites-enabled
 
 # Enable ufw
-ufw enable
+yes | ufw enable
 
 
 # Allow ports 
-ufw allow 80 
-ufw allow 443
-ufw allow 22
+yes | ufw allow 80 
+yes | ufw allow 443
+yes | ufw allow 22
 
 # Starting proxy
-systemctl restart nginx
+yes | systemctl restart nginx
 
 # Killing all listners of 8080
 kill $(lsof -t -i:8080)
 
 # Running
-cargo run --release
+./demcss > /root/server.log
