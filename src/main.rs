@@ -147,7 +147,7 @@ async fn main() -> std::io::Result<()> {
             .service(demo)
             .app_data(app_data.clone())
     })
-    .bind(("127.0.0.1", port))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }
