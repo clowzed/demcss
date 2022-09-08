@@ -11,7 +11,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 cd demcss
 
-source "$HOME/.cargo/env"
+. "$HOME/.cargo/env"
 
 # Building application
 cargo build --release
